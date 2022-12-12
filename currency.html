@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency</title>
+</head>
+
+<body>
+
+    <form>
+        <input id="currency" placeholder="Currency" type="text" list="symbolsList">
+        <datalist id="symbolsList">
+            <option value="GBP">Great Britain Pound</option>
+            <option value="EUR">Euro</option>
+            <option value="TRY">Turkish Lira</option>
+            <option value="IRR">Iranian Rial</option>
+        </datalist>
+        <input type="submit" value="Convert">
+    </form>
+    <div id="result">
+
+    </div>
+
+    <script>
+        const fetchApiOps = () => {
+            document.querySelector('form').onsubmit = () => {
+                document.querySelector('#result').innerHTML = 'loading...'
+
+                const myHeaders = new Headers()
+                myHeaders.append('apikey', 'iIB9mxEEebuZwLOzLWLiBqF4gsVCa7zx')
+                const requestOptions = {
+                    method: 'GET',
+                    redirect: 'follow',
+                    headers: myHeaders
+                }
+
+                const symbol = document.querySelector('#currency').value.toUpperCase()
+                fetch('https://api.apilayer.com/exchangerates_data/latest?' +
+                    `symbols=${symbol}&base=USD`, requestOptions)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data)
+                        if (!data.error) {
+                            const rate = data.rates[symbol]
+                            document.querySelector('#result').innerHTML =
+                                `1 USD is ${rate.toFixed(2)} ${symbol}.`
+                        } else {
+                            document.querySelector('#result').innerHTML = "Not found"
+                        }
+                    })
+                    .catch(error => {
+                        document.querySelector('#result').innerHTML = 'An error happend :('
+                        console.log('ERR:', error)
+                    })
+
+                return false
+            }
+        }
+        document.addEventListener('DOMContentLoaded', fetchApiOps)
+    </script>
+</body>
+
+</html>
