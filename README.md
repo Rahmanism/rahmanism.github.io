@@ -1,8 +1,9 @@
 ### Hi there 👋
 
 I'm a developer with some years of experience.  
-- 🔭 I’m currently working on some projects for an educational organization. I work with ASP.NET Webforms/C# there.
-- ⚛️ I'm working on the frontend of a new project using ReactJS.  
+- ⛩ I'm developing and maintaing a web project that interacts with door controls using .NET Core Web API and ReactJs.  
+- 🔭 I've worked on some projects for an educational organization. I've developed with ASP.NET Webforms/C# there.
+- ⚛️ I've worked on the frontend of a Daroog project using ReactJS.  
 - 💻 I did some work with Delphi making Windows desktop applications in the past.
 - 🌱 I've worked on a Vue project recently.
 
