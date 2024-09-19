@@ -1,5 +1,7 @@
 ### Hi there 👋
 
+<img src="./images/me.png" style="float: left; margin: 2rem;" />
+
 I'm a developer with some years of experience.  
 - ⛩ I'm developing and maintaing a web project that interacts with door controls using .NET Core Web API and ReactJs.  
 - 🔭 I've worked on some projects for an educational organization. I've developed with ASP.NET Webforms/C# there.
