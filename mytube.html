@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>MyTube</title>
+    <style>
+      :root {
+        --color: #eee;
+        --bg: #222;
+        --font-size: 1.2rem;
+        --radius: 0.3rem;
+        --big-radius: 1rem;
+      }
+
+      body {
+        background-color: var(--bg);
+        margin: 0 auto;
+        text-align: center;
+        color: var(--color);
+        display: flex;
+        flex-direction: column;
+        min-height: 98dvh;
+        padding: 1rem;
+        box-sizing: border-box;
+      }
+
+      iframe {
+        border-radius: var(--big-radius);
+        border: 1px solid #444;
+        width: 97dvw;
+        flex-grow: 1;
+      }
+
+      .form {
+        padding: 1rem;
+      }
+
+      .form input[type='text'] {
+        width: clamp(250px, 400px, 80%);
+        background-color: var(--bg);
+      }
+
+      .form button {
+        background-color: #1b76cf;
+        border-color: #1b76cf !important;
+        cursor: pointer;
+        min-width: 3rem;
+        width: fit-content;
+        max-width: 25rem;
+      }
+
+      .form button.normal-btn {
+        min-width: 7rem;
+      }
+
+      .form button:hover {
+        filter: brightness(1.2);
+        color: white;
+      }
+
+      .form button:active {
+        filter: brightness(0.8);
+      }
+
+      .form input[type='text'],
+      .form button {
+        padding: 0.5rem;
+        margin: 0.5rem 0.2rem;
+        border-radius: var(--radius);
+        border: 1px solid #777;
+        font-size: var(--font-size);
+        color: color-mix(in srgb, var(--color) 80%, black 20%);
+        transition: all 0.3s ease-in-out;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form">
+      <label for="videoUrl">Video URL:</label>
+      <input
+        type="text"
+        name="videoUrl"
+        id="videoUrl"
+      />
+      <button
+        id="loadBtn"
+        class="normal-btn"
+      >
+        Load
+      </button>
+    </div>
+
+    <iframe
+      id="videoFrame"
+      width="560"
+      height="315"
+      src=""
+      title="YouTube video player"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen
+    ></iframe>
+
+    <script>
+      const urlInput = document.getElementById('videoUrl')
+      const loadBtn = document.getElementById('loadBtn')
+      const iframe = document.getElementById('videoFrame')
+
+      function checkRequest() {
+        const params = new URLSearchParams(window.location.search)
+        const query = params.get('v')
+        if (query) {
+          const url = getUrl(query)
+          if (url) {
+            urlInput.value = url
+            iframe.setAttribute('src', url)
+          }
+        }
+      }
+
+      loadBtn.addEventListener('click', () => {
+        const urlValue = urlInput.value
+        const url = getUrl(urlValue)
+        if (!url) {
+          alert('Bad URL!')
+          return
+        }
+        iframe.setAttribute('src', url)
+      })
+
+      /// Check's if it's an OK URL, returns the suitable for embed or returens false
+      function getUrl(urlValue) {
+        // to check normal video url
+        const normalUrlParts = urlValue.split('?v=')
+        if (normalUrlParts.length === 2) {
+          return makeItEmbed(normalUrlParts[1])
+        }
+
+        // to check shortened youtu.be urls
+        const shortenedUrlParts = urlValue.split('.be/')
+        if (shortenedUrlParts.length === 2) {
+          return makeItEmbed(shortenedUrlParts[1])
+        }
+
+        // It's a bad url.
+        return false
+      }
+
+      /// Gets a video url key, and returns a embedable url
+      function makeItEmbed(urlPart) {
+        const urlKey = urlPart.replace('&t=', '&start=')
+        return `https://www.youtube.com/embed/${urlKey}`
+      }
+
+      /// If there's a url in the query string, we load it first.
+      document.addEventListener('DOMContentLoaded', () => {
+        checkRequest()
+      })
+    </script>
+  </body>
+</html>
