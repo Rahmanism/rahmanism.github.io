@@ -96,8 +96,6 @@
 
     <iframe
       id="videoFrame"
-      width="560"
-      height="315"
       src=""
       title="YouTube video player"
       frameborder="0"
@@ -114,10 +112,10 @@
       function checkRequest() {
         const params = new URLSearchParams(window.location.search)
         const query = params.get('v')
+		urlInput.value = query
         if (query) {
           const url = getUrl(query)
           if (url) {
-            urlInput.value = url
             iframe.setAttribute('src', url)
           }
         }
