@@ -153,7 +153,10 @@
 
       /// Gets a video url key, and returns a embedable url
       function makeItEmbed(urlPart) {
-        const urlKey = urlPart.replace('&t=', '&start=')
+        let urlKey = urlPart.replace('&t=', '&start=')
+		if (!urlKey.includes('&vq=')) {
+				urlKey += '?vq=hd1080'
+		}
         return `https://www.youtube.com/embed/${urlKey}`
       }
 
