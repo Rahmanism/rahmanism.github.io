@@ -2,10 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MyTube</title>
     <style>
       :root {
@@ -28,7 +25,7 @@
         box-sizing: border-box;
       }
 
-      iframe {
+      #videoContainer {
         border-radius: var(--big-radius);
         border: 1px solid #444;
         width: 97dvw;
@@ -79,88 +76,93 @@
     </style>
   </head>
   <body>
+    2
     <div class="form">
       <label for="videoUrl">Video URL:</label>
-      <input
-        type="text"
-        name="videoUrl"
-        id="videoUrl"
-      />
-      <button
-        id="loadBtn"
-        class="normal-btn"
-      >
-        Load
-      </button>
+      <input type="text" name="videoUrl" id="videoUrl" />
+      <button id="loadBtn" class="normal-btn">Load</button>
     </div>
 
-    <iframe
-      id="videoFrame"
-      src=""
-      title="YouTube video player"
-      frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      referrerpolicy="strict-origin-when-cross-origin"
-      allowfullscreen
-    ></iframe>
+    <div id="videoContainer"></div>
 
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
       const urlInput = document.getElementById('videoUrl')
       const loadBtn = document.getElementById('loadBtn')
       const iframe = document.getElementById('videoFrame')
 
-      function checkRequest() {
-        const params = new URLSearchParams(window.location.search)
-        const query = params.get('v')
-		urlInput.value = query
-        if (query) {
-          const url = getUrl(query)
-          if (url) {
-            iframe.setAttribute('src', url)
-          }
+      let videoKey = ''
+
+      let player = null
+
+      // This function is called by the YouTube IFrame API
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player('videoContainer', {
+          // height: '390',
+          // width: '640',
+          videoId: videoKey,
+          playerVars: {
+            autoplay: 1,
+            controls: 1,
+            modestbranding: 1,
+            rel: 0,
+          },
+          events: {
+            onReady: onPlayerReady,
+          },
+        })
+      }
+
+      function onPlayerReady(event) {
+        if (!videoKey) return
+        changeVideo(videoKey)
+        // Attempt to set the quality
+        player.setPlaybackQuality('hd1080')
+        event.target.playVideo()
+      }
+
+      // Function to change the video
+      function changeVideo(newVideoId) {
+        if (player && typeof player.loadVideoById === 'function') {
+          player.loadVideoById({ videoId: newVideoId })
+        } else {
+          console.error(
+            'Player not yet initialized or loadVideoById not available'
+          )
+          // Handle the case where the player isn't ready yet, e.g., queue the videoId
+          // or display a message to the user.
         }
       }
 
       loadBtn.addEventListener('click', () => {
         const urlValue = urlInput.value
-        const url = getUrl(urlValue)
-        if (!url) {
+        getUrl(urlValue)
+        if (!videoKey) {
           alert('Bad URL!')
           return
         }
-        iframe.setAttribute('src', url)
       })
 
       /// Check's if it's an OK URL, returns the suitable for embed or returens false
       function getUrl(urlValue) {
-        // to check normal video url
-        const normalUrlParts = urlValue.split('?v=')
-        if (normalUrlParts.length === 2) {
-          return makeItEmbed(normalUrlParts[1])
+        const vUrl = urlValue.href ? urlValue : new URL(urlValue)
+        const params = new URLSearchParams(vUrl.search)
+        const query = params.get('v')
+
+        if (!query) {
+          videoKey = ''
+          return false
         }
 
-        // to check shortened youtu.be urls
-        const shortenedUrlParts = urlValue.split('.be/')
-        if (shortenedUrlParts.length === 2) {
-          return makeItEmbed(shortenedUrlParts[1])
-        }
+        videoKey = query
+        changeVideo(videoKey)
 
-        // It's a bad url.
-        return false
-      }
-
-      /// Gets a video url key, and returns a embedable url
-      function makeItEmbed(urlPart) {
-        let urlKey = urlPart.replace('&t=', '&start=')
-		if (!urlKey.includes('&vq=')) {
-				urlKey += '?vq=hd1080'
-		}
-        return `https://www.youtube.com/embed/${urlKey}`
+        return `https://www.youtube.com/embed/${query}`
       }
 
       /// If there's a url in the query string, we load it first.
       document.addEventListener('DOMContentLoaded', () => {
-        checkRequest()
+        getUrl(window.location)
       })
     </script>
   </body>
